@@ -2,6 +2,16 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+// ─── Définition unique de LAYER_NAMES ────────────────────────
+const char *LAYER_NAMES[LAYER_COUNT] = {
+    "Background",
+    "Flat_Color",
+    "Shadow",
+    "Highlight",
+    "Effects",
+    "Outline",
+};
+
 void canvas_get_size(CanvasFormat fmt, int *w, int *h) {
     switch (fmt) {
         case FMT_LANDSCAPE: *w = 1920; *h = 1080; break;
@@ -15,21 +25,18 @@ Canvas *canvas_create(CanvasFormat fmt) {
     canvas_get_size(fmt, &c->width, &c->height);
     c->format = fmt;
 
-    // Créer chaque calque (ARGB32 pour transparence)
     for (int i = 0; i < LAYER_COUNT; i++) {
         c->layers[i] = cairo_image_surface_create(
             CAIRO_FORMAT_ARGB32, c->width, c->height);
         c->cr[i] = cairo_create(c->layers[i]);
 
-        // Tout transparent par défaut
         cairo_save(c->cr[i]);
         cairo_set_operator(c->cr[i], CAIRO_OPERATOR_CLEAR);
         cairo_paint(c->cr[i]);
         cairo_restore(c->cr[i]);
     }
 
-    // Surface composite (RGB24, fond blanc)
-    c->composite = cairo_image_surface_create(
+    c->composite    = cairo_image_surface_create(
         CAIRO_FORMAT_RGB24, c->width, c->height);
     c->cr_composite = cairo_create(c->composite);
 
@@ -61,11 +68,9 @@ void canvas_clear_layer(Canvas *c, LayerID layer) {
 void canvas_composite(Canvas *c) {
     cairo_t *cr = c->cr_composite;
 
-    // Fond blanc
     cairo_set_source_rgb(cr, 1, 1, 1);
     cairo_paint(cr);
 
-    // Empiler les calques dans l'ordre
     for (int i = 0; i < LAYER_COUNT; i++) {
         cairo_set_source_surface(cr, c->layers[i], 0, 0);
         cairo_set_operator(cr, CAIRO_OPERATOR_OVER);

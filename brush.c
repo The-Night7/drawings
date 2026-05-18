@@ -2,6 +2,11 @@
 #include <math.h>
 #include <stdlib.h>
 
+// ─── Portabilité M_PI ─────────────────────────────────────────
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
 // ─── Constructeurs ────────────────────────────────────────────
 Brush brush_ink(double size) {
     return (Brush){
@@ -76,14 +81,11 @@ Brush brush_halftone(ColorID color, double dot_size) {
 }
 
 // ─── Helpers internes ─────────────────────────────────────────
-
-// Applique couleur + opacité depuis un Brush
 static void apply_brush_color(cairo_t *cr, Brush *b) {
     Color c = palette_get(b->color);
     cairo_set_source_rgba(cr, c.r, c.g, c.b, b->opacity);
 }
 
-// Jitter pseudo-aléatoire reproductible
 static double jitter_val(double jitter, int seed) {
     srand(seed);
     return ((double)rand() / RAND_MAX - 0.5) * 2.0 * jitter;
@@ -98,20 +100,18 @@ void brush_stroke(cairo_t *cr, Brush *b,
     cairo_set_line_join(cr, CAIRO_LINE_JOIN_ROUND);
 
     if (b->taper) {
-        // Effilement : on dessine plusieurs segments de plus en plus fins
         int steps = 12;
         double dx = x2 - x1, dy = y2 - y1;
         for (int i = 0; i < steps; i++) {
             double t0 = (double)i / steps;
-            double t1 = (double)(i+1) / steps;
-            // Profil d'épaisseur : sin pour effilement aux deux bouts
-            double w = b->size * sin(M_PI * (t0 + t1) * 0.5);
+            double t1 = (double)(i + 1) / steps;
+            double w  = b->size * sin(M_PI * (t0 + t1) * 0.5);
             if (w < 0.5) w = 0.5;
             cairo_set_line_width(cr, w);
             double jx = jitter_val(b->jitter, i * 7 + 3);
             double jy = jitter_val(b->jitter, i * 13 + 7);
-            cairo_move_to(cr, x1 + dx*t0 + jx, y1 + dy*t0 + jy);
-            cairo_line_to(cr, x1 + dx*t1 + jx, y1 + dy*t1 + jy);
+            cairo_move_to(cr, x1 + dx * t0 + jx, y1 + dy * t0 + jy);
+            cairo_line_to(cr, x1 + dx * t1 + jx, y1 + dy * t1 + jy);
             cairo_stroke(cr);
         }
     } else {
@@ -187,16 +187,14 @@ void brush_speedlines(cairo_t *cr, Brush *b,
     srand(seed);
     for (int i = 0; i < count; i++) {
         double angle = ((double)i / count) * 2.0 * M_PI;
-        // Variation aléatoire de l'angle
-        angle += ((double)rand()/RAND_MAX - 0.5) * (2.0 * M_PI / count) * 0.6;
+        angle += ((double)rand() / RAND_MAX - 0.5)
+                 * (2.0 * M_PI / count) * 0.6;
 
-        // Épaisseur variable : plus épais au centre
-        double w = b->size * (0.5 + (double)rand()/RAND_MAX * 1.5);
+        double w = b->size * (0.5 + (double)rand() / RAND_MAX * 1.5);
         cairo_set_line_width(cr, w);
 
-        // Longueur variable
-        double r_out = inner_r + (outer_r - inner_r) *
-                       (0.6 + 0.4 * (double)rand()/RAND_MAX);
+        double r_out = inner_r + (outer_r - inner_r)
+                       * (0.6 + 0.4 * (double)rand() / RAND_MAX);
 
         double x1 = cx + cos(angle) * inner_r;
         double y1 = cy + sin(angle) * inner_r;
@@ -221,8 +219,8 @@ void brush_halftone_fill(cairo_t *cr, Brush *b,
 
     for (int row = 0; row < rows; row++) {
         for (int col = 0; col < cols; col++) {
-            double px = x + col * spacing +
-                        (row % 2 == 0 ? 0 : spacing * 0.5);
+            double px = x + col * spacing
+                        + (row % 2 == 0 ? 0 : spacing * 0.5);
             double py = y + row * spacing;
             cairo_new_path(cr);
             cairo_arc(cr, px, py, dot_r, 0, 2 * M_PI);
