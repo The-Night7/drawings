@@ -2,28 +2,6 @@
 
 // ─── Définition de la palette Comics US ──────────────────────
 static const Color PALETTE[PALETTE_SIZE] = {
-    // Noirs & blancs
-    [COL_BLACK]        = {0.05, 0.05, 0.08, 1.0},
-    [COL_INK]          = {0.08, 0.08, 0.15, 1.0},
-    [COL_WHITE]        = {1.00, 1.00, 1.00, 1.0},
-    [COL_PAPER]        = {0.98, 0.96, 0.90, 1.0},
-
-    // Rouges (style Superman/Spider-Man)
-    [COL_RED_HI]       = {1.00, 0.75, 0.70, 1.0},
-    [COL_RED_BASE]     = {0.90, 0.15, 0.15, 1.0},
-    [COL_RED_SHADOW]   = {0.60, 0.05, 0.05, 1.0},
-    [COL_RED_DEEP]     = {0.35, 0.02, 0.02, 1.0},
-
-    // Bleus (style Captain America)
-    [COL_BLUE_HI]      = {0.70, 0.80, 1.00, 1.0},
-    [COL_BLUE_BASE]    = {0.15, 0.35, 0.85, 1.0},
-    [COL_BLUE_SHADOW]  = {0.05, 0.15, 0.55, 1.0},
-    [COL_BLUE_DEEP]    = {0.02, 0.05, 0.30, 1.0},
-
-    // Jaunes (style Batman/Flash)
-    [COL_YELLOW_HI]    = {1.00, 1.00, 0.70, 1.0},
-    [COL_YELLOW_BASE]  = {0.95, 0.80, 0.05, 1.0},
-    [COL_YELLOW_SHADOW]= {0.70, 0.55, 0.02, 1.0},
     [COL_YELLOW_DEEP]  = {0.45, 0.30, 0.01, 1.0},
 
     // Verts (style Hulk)
